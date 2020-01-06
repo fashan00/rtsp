@@ -1,6 +1,7 @@
 const Koa = require('koa');
 const Router = require('koa-router');
-const Stream = require('node-rtsp-stream');
+// const Stream = require('node-rtsp-stream');
+const Stream = require('../node-rtsp-stream-master/index');
 const uniqid = require('uniqid');
 var http = require('http');
 var url = require('url');
