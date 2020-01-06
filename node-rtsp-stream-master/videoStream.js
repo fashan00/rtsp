@@ -88,7 +88,8 @@ VideoStream.prototype.startMpeg1Stream = function() {
 
 VideoStream.prototype.pipeStreamToSocketServer = function() {
   this.wsServer = new ws.Server({
-    port: this.wsPort
+    // port: this.wsPort
+    noServer: true
   })
   this.wsServer.on("connection", (socket, request) => {
     return this.onSocketConnect(socket, request)

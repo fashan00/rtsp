@@ -9,36 +9,17 @@ var url = require('url');
 const app = new Koa();
 const router = new Router();
 
-stream = new Stream({
-  name: 'name',
-  streamUrl: 'rtsp://58.99.33.8:1935/ipcam/172.28.0.130.stream',
-  wsPort: 9999,
-  ffmpegOptions: { // options ffmpeg flags
-    '-stats': '', // an option with no neccessary value uses a blank string
-    '-r': 30, // options with required values specify the value after the key
-    '-s': '960x540',
-    '-q': 4,
-  }
-})
-
-/*
-const server = http.createServer();
-
-server.on('upgrade', (request, socket, head) => {
-  const pathname = url.parse(request.url).pathname;
-
-  if (pathname === '/foo') {
-    wss1.handleUpgrade(request, socket, head, (ws) => {
-      wss1.emit('connection', ws);
-    });
-  } else if (pathname === '/bar') {
-    wss2.handleUpgrade(request, socket, head, (ws) => {
-      wss2.emit('connection', ws);
-    });
-  } else {
-    socket.destroy();
-  }
-});
+// stream = new Stream({
+//   name: 'name',
+//   streamUrl: 'rtsp://58.99.33.8:1935/ipcam/172.28.0.130.stream',
+//   wsPort: 9999,
+//   ffmpegOptions: { // options ffmpeg flags
+//     '-stats': '', // an option with no neccessary value uses a blank string
+//     '-r': 30, // options with required values specify the value after the key
+//     '-s': '960x540',
+//     '-q': 4,
+//   }
+// })
 
 var ClientSteams = {};
 
@@ -50,39 +31,48 @@ server.on('upgrade', function upgrade(request, socket, head) {
 
   var splitPath = pathname.split('/')
 
-  console.log('\npathname', pathname, splitPath[2]);
-  
-  //Check to make sure it is infact a correct wss request
-  if (true) {
-    console.log("path :" + pathname)
-    var splitPath = pathname.split('/');
+  console.log('\npathname', pathname, splitPath[1], splitPath[2]);
+  const action = splitPath[1];
+  const id = splitPath[2];
+  const stream = ClientSteams[id];
 
-    //Here I am parsing the request path to a UID that is going to help me get the ws connection
-    //I have a dictionary of these active ws connections
-    // var reqKey = splitPath[2] + splitPath[3];
-    var reqKey = splitPath[2]
-    for (var key in ClientSteams) {
-      // check if the property/key is defined 
-      if (ClientSteams.hasOwnProperty(key) && key == reqKey) {
-        //This is the key, it finds the wsServer and then emits it to my current connection
-        ClientSteams[key].wsServer.handleUpgrade(request, socket, head, function done(ws) {
-          ClientSteams[key].wsServer.emit('connection', ws, request);
-        });
-      }
-    }
+  //Check to make sure it is correct ws request and check if the stream of id is exist 
+  if (action === 'play' && stream) {
+    //This is the key, it finds the wsServer and then emits it to my current connection
+      stream.wsServer.handleUpgrade(request, socket, head, function done(ws) {
+        stream.wsServer.emit('connection', ws, request);
+      });
+
   } else {
     socket.destroy();
   }
 });
 
-router.get('/api/play/', (ctx, next) => {
+router.get('/api/play/1', (ctx, next) => {
   const url = ctx.request.query.url;
 
-  const id = ctx.request.query.id;
+  const id = 1;
 
   var stream = new Stream({
-    name: id,
-    streamUrl: url
+    id: id,
+    streamUrl: 'rtsp://58.99.33.8:1935/ipcam/172.28.0.130.stream'
+  });
+
+
+  ClientSteams[id] = stream;
+
+  ctx.body = `play rtsp ...${id}`;
+});
+
+
+router.get('/api/play/2', (ctx, next) => {
+  const url = ctx.request.query.url;
+
+  const id = 2;
+
+  var stream = new Stream({
+    id: id,
+    streamUrl: 'rtsp://58.99.33.8:1935/ipcam/172.28.0.122.stream'
   });
 
 
@@ -155,5 +145,5 @@ function listDict() {
 
 */
 
-// app.use(router.routes()).use(router.allowedMethods());
+app.use(router.routes()).use(router.allowedMethods());
 app.listen(5000);
