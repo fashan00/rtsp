@@ -1,0 +1,20 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "http": "0.0.0",
+    "koa": "^2.11.0",
+    "koa-router": "^7.4.0",
+    "node-rtsp-stream": "^0.0.8",
+    "uniqid": "^5.2.0",
+    "url": "^0.11.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
