@@ -1,8 +1,22 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import JSMpeg from '@cycjimmy/jsmpeg-player';
+import axios from 'axios';
 
 function App() {
+
+async function handlePlayClick(url, videoWrapper){
+
+  const result = await axios(
+    `http://localhost:5000/api/play?url=${url}`,
+  );
+
+  var ws = `ws://localhost/play/${result.data}`;
+  const player = new JSMpeg.VideoElement(videoWrapper, ws);
+  player.play();
+}
+
   return (
     <div className="App">
       <header className="App-header">
@@ -18,6 +32,16 @@ function App() {
         >
           Learn React
         </a>
+        <div className='video'>
+          <div className='video-container'>
+            <div id="videoWrapper1" className='video-wrapper'></div>
+            <button onClick={() => handlePlayClick('rtsp://58.99.33.8:1935/ipcam/172.28.0.130.stream','#videoWrapper1')}>play</button>
+          </div>
+          <div className='video-container'>
+            <div id="videoWrapper2" className='video-wrapper'></div>
+            <button onClick={() => handlePlayClick('rtsp://58.99.33.8:1935/ipcam/172.28.0.122.stream','#videoWrapper2')}>play</button>
+          </div>
+        </div>
       </header>
     </div>
   );

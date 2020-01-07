@@ -3,7 +3,7 @@
 }
 
 .App-logo {
-  height: 40vmin;
+  height: 10vmin;
   pointer-events: none;
 }
 
@@ -35,4 +35,21 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.video {
+  display: flex;
+  align-items: center;
+}
+
+.video-container
+{
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+}
+
+.video-wrapper{
+  width: 500px;
+  height: 500px;
 }
