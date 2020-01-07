@@ -1,5 +1,6 @@
 const Koa = require('koa');
 const Router = require('koa-router');
+const cors = require('@koa/cors');
 // const Stream = require('node-rtsp-stream');
 const Stream = require('../node-rtsp-stream-master/index');
 const uniqid = require('uniqid');
@@ -35,7 +36,7 @@ server.on('upgrade', function upgrade(request, socket, head) {
   const action = splitPath[1];
   const id = splitPath[2];
   const stream = ClientSteams[id];
-
+  
   //Check to make sure it is correct ws request and check if the stream of id is exist 
   if (action === 'play' && stream) {
     //This is the key, it finds the wsServer and then emits it to my current connection
@@ -48,37 +49,35 @@ server.on('upgrade', function upgrade(request, socket, head) {
   }
 });
 
-router.get('/api/play/1', (ctx, next) => {
+router.get('/api/play', (ctx, next) => {
   const url = ctx.request.query.url;
 
-  const id = 1;
-
-  var stream = new Stream({
+  const id = uniqid();
+  const stream = new Stream({
     id: id,
-    streamUrl: 'rtsp://58.99.33.8:1935/ipcam/172.28.0.130.stream'
+    streamUrl: url,
+    ffmpegOptions: { // options ffmpeg flags
+      '-stats': '', // an option with no neccessary value uses a blank string
+      '-r': 30, // options with required values specify the value after the key
+      '-s': '960x540',
+      '-q': 4,
+    }
   });
-
 
   ClientSteams[id] = stream;
 
-  ctx.body = `play rtsp ...${id}`;
+  ctx.body = id;
 });
 
-
-router.get('/api/play/2', (ctx, next) => {
-  const url = ctx.request.query.url;
-
-  const id = 2;
-
-  var stream = new Stream({
-    id: id,
-    streamUrl: 'rtsp://58.99.33.8:1935/ipcam/172.28.0.122.stream'
-  });
-
-
-  ClientSteams[id] = stream;
-
-  ctx.body = `play rtsp ...${id}`;
+router.get('/api/stop/:id', (ctx, next) => {
+  const id = ctx.params.id;
+  const stream = ClientSteams[id];
+  if (stream){
+    stream.stop();
+    delete stream;
+  }
+    
+  ctx.body = `stop ${id}`;
 });
 
 /*
@@ -145,5 +144,6 @@ function listDict() {
 
 */
 
+app.use(cors());
 app.use(router.routes()).use(router.allowedMethods());
 app.listen(5000);
