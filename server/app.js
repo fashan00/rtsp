@@ -29,13 +29,10 @@ const server = http.createServer(app.callback()).listen(80);
 //On a secure websocket request from the front end, this gets hit
 server.on('upgrade', function upgrade(request, socket, head) {
   const pathname = url.parse(request.url).pathname;
-
   var splitPath = pathname.split('/')
-
-  console.log('\npathname', pathname, splitPath[1], splitPath[2]);
   const action = splitPath[1];
   const id = splitPath[2];
-  const stream = ClientSteams[id];
+  const stream = ClientSteams[id].stream;
   
   //Check to make sure it is correct ws request and check if the stream of id is exist 
   if (action === 'play' && stream) {
@@ -51,8 +48,18 @@ server.on('upgrade', function upgrade(request, socket, head) {
 
 router.get('/api/play', (ctx, next) => {
   const url = ctx.request.query.url;
+  var id;
+  id = Object.keys(ClientSteams).find(id => ClientSteams[id].url === url);
+  if (!url)
+  {
+    ctx.status = 400;
+    return;
+  } else if(id){
+    ctx.body = id;
+    return;
+  }
 
-  const id = uniqid();
+  id = uniqid();
   const stream = new Stream({
     id: id,
     streamUrl: url,
@@ -64,14 +71,17 @@ router.get('/api/play', (ctx, next) => {
     }
   });
 
-  ClientSteams[id] = stream;
+  ClientSteams[id] = {
+    url: url,
+    stream: stream
+  }
 
   ctx.body = id;
 });
 
 router.get('/api/stop/:id', (ctx, next) => {
   const id = ctx.params.id;
-  const stream = ClientSteams[id];
+  const stream = ClientSteams[id].stream;
   if (stream){
     stream.stop();
     delete stream;

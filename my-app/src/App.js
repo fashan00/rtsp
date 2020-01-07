@@ -5,16 +5,27 @@ import JSMpeg from '@cycjimmy/jsmpeg-player';
 import axios from 'axios';
 
 function App() {
+  var playsList = {};
 
 async function handlePlayClick(url, videoWrapper){
+
+  const player = playsList[videoWrapper]
+  if(player){
+    player.destroy();
+  }
 
   const result = await axios(
     `http://localhost:5000/api/play?url=${url}`,
   );
 
-  var ws = `ws://localhost/play/${result.data}`;
-  const player = new JSMpeg.VideoElement(videoWrapper, ws);
-  player.play();
+  if(result.status === 200){
+
+    var ws = `ws://localhost/play/${result.data}`;
+    const player = new JSMpeg.VideoElement(videoWrapper, ws);
+    player.play();
+
+    playsList[videoWrapper] = player;
+  }
 }
 
   return (
