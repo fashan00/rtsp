@@ -24,7 +24,7 @@ const router = new Router();
 
 var ClientSteams = {};
 
-const server = http.createServer(app.callback()).listen(80);
+const server = http.createServer().listen(80);
 
 //On a secure websocket request from the front end, this gets hit
 server.on('upgrade', function upgrade(request, socket, head) {
